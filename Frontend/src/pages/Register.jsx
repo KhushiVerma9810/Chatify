@@ -2,6 +2,8 @@ import React , {useState , useEffect}from 'react'
 import { Link } from 'react-router-dom';
 import styled from "styled-components";
 import logo from "../assets/chat.png"
+import axios from 'axios';
+import { registerRoute } from "../utils/APIRoutes";
 const Register = () => {
 
 const [values , setValues]= useState({
@@ -11,20 +13,71 @@ const [values , setValues]= useState({
   confirmpPassword:"",
 })
 
-const handleSubmit = (event)=>{
+const handleSubmit = async(event)=>{
   event.preventDefault();
-  alert("form");
+  if(handlevalidation()){
+    const {password , confirmPassword,username,email}=values;
+    const{data} = await axios.post(registerRoute , {
+      username ,email , password,
+    });
+  }
 
 }
-const handlevalidation = () => {
-  let pass = document.getElementsByClassName('password');
-  pass.addEventListener("input", function(event) {
-    if (pass.validity.tooShort) {
-      pass.setCustomValidity("Password must be 6 or more characters");
-    } else {
-      pass.setCustomValidity("");
-    }
-  })
+// const usernamevalidate=()=>{
+//   let usernameInput = document.getElementById("Username");
+
+// usernameInput.addEventListener("input", function() {
+//   const value = usernameInput.value.trim();
+  
+//   if (!/^[a-zA-Z]{5,}$/.test(value)) {
+//     usernameInput.setCustomValidity("Username must contain only letters and be at least 5 characters long");
+//   } else {
+//     usernameInput.setCustomValidity("");
+//   }
+// });
+// }
+const handlevalidation = (values) => {
+  const {username, password, confirmPassword, email} = values || {};
+  
+  // Validate password
+  const passwordInput = document.getElementById('pass');
+  if (passwordInput.value.length < 8) {
+    passwordInput.setCustomValidity('Password must be at least 8 characters long');
+  } else if (password !== confirmPassword) {
+    passwordInput.setCustomValidity('Passwords do not match');
+  } else {
+    passwordInput.setCustomValidity('');
+}
+  // Validate username
+  const usernameInput = document.getElementById('Username');
+  if (usernameInput.value.length < 4 || /\d/.test(username)) {
+    usernameInput.setCustomValidity('Username must be at least 4 characters long');
+  } else {
+    usernameInput.setCustomValidity('');
+  }
+
+const emailInput = document.getElementById('email');
+if (emailInput.value === "") {
+  emailInput.setCustomValidity("Email is required");
+} else {
+  emailInput.setCustomValidity("");
+}
+  
+  // confirmPassword.addEventListener('input', function() {
+  //   if (confirmPassword.value!== password.value) {
+  //     confirmPassword.setCustomValidity('Passwords do not match');
+  //   } else {
+  //     confirmPassword.setCustomValidity('');
+  //   }
+  // });
+  // let pass = document.getElementsByClassName('password');
+  // password.addEventListener("input", function(event) {
+  //   if (password.validity.tooShort) {
+  //     password.setCustomValidity("Password must be 6 or more characters");
+  //   } else {
+  //     password.setCustomValidity("");
+  //   }
+  // })
   // if (pass.length < 6) {
   //   // Add an event listener for the 'invalid' event
   //   document.getElementById('password').addEventListener('invalid', function(event) {
@@ -35,16 +88,25 @@ const handlevalidation = () => {
   //   document.getElementById('password').validity.valid = false;
   // }
 
-  let usernameInput = document.getElementById('Username');
-      usernameInput.addEventListener('input', () => {
-        const usernameRegex = /^[A-Za-z]+$/;
-        if (!usernameRegex.test(usernameInput.value)) {
-          usernameInput.setCustomValidity('Username should only contain letters.');
-        } else {
-          usernameInput.setCustomValidity('');
-        }
-      })
-  } ;
+//   const username = document.getElementById('Username');
+// username.addEventListener('input', () => {
+//   const usernameValue = username.value;
+//   if (usernameValue.length < 4 || /\d/.test(username)) {
+//     usernameValue.setCustomValidity('Username should only contain letters and be at least 4 characters long.');
+//   } else {
+//     usernameValue.setCustomValidity('');
+//   }
+
+// });
+
+// const{username} = values;
+
+// const isValid = /^[a-zA-Z]+$/.test(username) && username.length > 4;
+// const errorMessage = "Username must be at least 5 letters and contain only letters.";
+// const usernameInput = document.getElementById("username");
+// usernameInput.setCustomValidity(isValid ? "" : errorMessage);
+}
+
   // uname.oninvalid=function(event){
   //   event.target.setCustomValidity('Username should only contain lowercase letters. e.g. khushi')
   // }
@@ -62,24 +124,27 @@ const handleChange=(event)=>{
       <input type="text" placeholder='Username'
       name='username'
       id='Username'
-      pattern="[A-Za-z]+"
       required
+      // onBlur={usernamevalidate}
       onChange={(e)=>handleChange(e)}
       />
       <input type="email" placeholder='Email'
       name='email'
+      id='email'
       onChange={(e)=>handleChange(e)}
       />
       <input type="password" placeholder='Password'
       name='password'
      className ='password'
      minlength="6"
+     id='pass'
       onChange={(e)=>handleChange(e)}/>
 
-      <input type="password" placeholder='Confirm Password'
+      <input type="password" placeholder='Confirm Password'  
        minlength="6"
        className='password'
       name='confirmpassword'
+      id='confirmpass'
       onChange={(e)=>handleChange(e)}/>
      <button type='submit'>Create User</button>
      <span>Already have an account?<Link to="/login">Login</Link></span>

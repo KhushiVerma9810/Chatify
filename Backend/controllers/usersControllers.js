@@ -23,3 +23,22 @@ module.exports.register = async(req , res , next) =>{
 }
 
 };
+
+//login controllers
+module.exports.login = async(req , res , next) =>{
+    try{
+    const{username , password}=req.body;
+    //checking for username , emails are present or not
+    const user = await User.findOne({ username});
+    if(!user)
+    return res.json({msg:"Incorrect Username or Password" , status:false});
+    const isPasswordValid = await brcypt.compare(password , user.password)
+    if(!isPasswordValid)
+    return res.json({msg:"Incorrect Username or Password" , status:false});
+    delete user.password;
+    return res.json({status:true , user})
+}catch(ex){
+    next(ex);
+}
+
+};

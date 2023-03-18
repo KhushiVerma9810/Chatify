@@ -11,8 +11,8 @@ navigate("/login");
     };
   return (
     <div>
-        <Button onClick={handleclick()}>
-        <i className="gg-log-out"></i>
+        <Button>
+        <i className="bi bi-box-arrow-left"></i>
         </Button>
     </div>
   )
@@ -30,7 +30,7 @@ svg {
   font-size: 1.3rem;
   color: #ebe7ff;
 }
-.gg-log-out{
+.bi{
     color:white;
 }`
 export default Logout

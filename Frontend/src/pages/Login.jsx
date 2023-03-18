@@ -89,7 +89,7 @@ const handleChange=(event)=>{
       onChange={(e)=>handleChange(e)}
       />
      <button type='submit'>Login</button>
-     <span>Don't have an account?<Link to="/">Register</Link></span>
+     <span>Don't have an account?<Link to="/register">Register</Link></span>
     </form>
    </FormContainer>
 

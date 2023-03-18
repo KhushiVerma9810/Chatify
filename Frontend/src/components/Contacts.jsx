@@ -4,7 +4,7 @@ import logo from "../assets/chat.png"
 import { useEffect } from 'react'
 import styled from 'styled-components'
 
-function Contacts({contacts , currentUser}) {
+function Contacts({contacts , currentUser , changeChat}) {
 const [currentUserName , setCurrentUserName]= useState(undefined);
 const [currentUserImage , setCurrentUserImage]= useState(undefined);
 const [currentSelected , setCurrentSelected]=useState(undefined);
@@ -19,7 +19,10 @@ if(currentUser){
 }, [currentUser]);
 
 
-const changeCurrentChat = (index , contact)=>{};
+const changeCurrentChat = (index , contact)=>{
+  setCurrentSelected(index);
+  changeChat(contact);
+};
   return (
     <>
       {currentUserImage && currentUserImage && (
@@ -36,6 +39,7 @@ const changeCurrentChat = (index , contact)=>{};
                   className={`contact ${
                     index === currentSelected ? "selected" : ""
                   }`}
+                  onClick={() => changeCurrentChat(index, contact)}
                 >
                   <div className="avatar">
                     <img

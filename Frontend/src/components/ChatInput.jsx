@@ -4,7 +4,7 @@ import EmojiPicker from "emoji-picker-react"
 import { Emoji, EmojiStyle } from 'emoji-picker-react';
 import { useState } from 'react'
 
-const ChatInput = () => {
+const ChatInput = ({handleSendMsg }) => {
 const [showEmojiPicker , setSHowEmojiPicker] = useState(false);
 const [msg , setMsg] = useState("");
 
@@ -16,6 +16,13 @@ const handleEmojiClick = (emojiObject , event) => {
    message += emojiObject.emoji;
     setMsg(message);
 };
+const sendChat = (event)=>{
+  event.preventDefault();
+  if(msg.length >0){
+    handleSendMsg(msg);
+    setMsg('');
+  }
+}
 
   return (
     <Container>
@@ -27,7 +34,7 @@ const handleEmojiClick = (emojiObject , event) => {
       
         </div>
         </div>
-        <form className='input-container'>
+        <form className='input-container' onSubmit={(e)=>sendChat(e)}>
           <input type="text" placeholder='Type your message here' value={msg} onChange={(e)=>setMsg(e.target.value)}/>
           <button className='submit'>
           <i className="bi bi-send-fill"></i>

@@ -7,12 +7,12 @@ const Logout = () => {
     const navigate = useNavigate();
     const handleclick = async()=>{
 localStorage.clear();
-navigate("/login");
+navigate("/");
     };
   return (
     <div>
         <Button>
-        <i className="bi bi-box-arrow-left"></i>
+        <i onClick={handleclick} className="bi bi-box-arrow-left"></i>
         </Button>
     </div>
   )

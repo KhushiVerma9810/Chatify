@@ -230,7 +230,7 @@ const handleChange=(event)=>{
       // onChange={(e) => setConfirmPassword(e.target.value)}
       />
      <button type='submit'>Create User</button>
-     <span>Already have an account?<Link to="/login">Login</Link></span>
+     <span>Already have an account?<Link to="/">Login</Link></span>
     </form>
    </FormContainer>
 

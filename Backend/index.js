@@ -44,10 +44,39 @@ io.on("connection" ,(socket)=>{
     })
 
     //the message send the online users and receive a message on that time
-      socket.on("send-msg" ,(data)=>{
+      socket.on("send-msg" ,(data , user)=>{
         const sendUserSocket = onlineUsers.get(data.to);
+      
         if(sendUserSocket){
-            socket.to(sendUserSocket).emit("msg-receive" , data.message);
+            socket.to(sendUserSocket).emit("msg-receive" , data.message,
+);
         }
+      });
+      // socket.on('typing1' , (msg)=>{
+      //   io.emit('typing',msg)
+      // })
+
+      // socket.on('sendTyping' , (data)=>{
+      //   console.log(data.username+'is typing in ' + data.to)
+      //   io.to(data.to).emit('typing1',data);
+      // })
+      // const getUser = (username) => {
+      //   return onlineUsers.find((user) => user.username === username);
+      // };
+      // socket.on("sendNotification", ({ senderName, receiverName }) => {
+      //   const receiver = getUser(receiverName);
+      //   io.to(receiver.userId).emit("getNotification", {
+      //     senderName,
+      //   });
+      // });
+      const getUser = (userId) => {
+        return onlineUsers.get(userId);
+      };
+      
+      socket.on("sendNotification", ({ senderName, receiverName }) => {
+        const receiver = getUser(receiverName);
+        io.to(receiver.userId).emit("getNotification", {
+          senderName,
+        });
       });
 } );

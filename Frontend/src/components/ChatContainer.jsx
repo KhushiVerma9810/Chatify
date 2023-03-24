@@ -2,7 +2,6 @@ import React, { useRef } from 'react'
 import styled from 'styled-components'
 import Logout from './Logout';
 import ChatInput from './ChatInput';
-import Messages from"./Messages"
 import { useState , useEffect } from 'react';
 import axios from 'axios';
 import { sendMessageRoute } from '../utils/APIRoutes';
@@ -10,13 +9,15 @@ import { getAllMessageRoute } from '../utils/APIRoutes';
 import { v4 as uuidv4 } from "uuid";
 
 
+
 const ChatContainer = ({currentChat,currentUser , socket}) => {
   //Destructuring
   const [messages , setMessages]= useState([]);
    const [arrivalMessage ,setArrivalMessage ] = useState(null);
-    
+  // const [showNotificationDot, setShowNotificationDot] = useState(false);
+  const [messageCount , setMessageCount] = useState(0);
    const scrollRef = useRef();
-   
+  const [latestMessage, setLatestMessage] = useState(null);
   useEffect(() => {
     if(currentChat){
     (async () => {
@@ -40,7 +41,7 @@ const ChatContainer = ({currentChat,currentUser , socket}) => {
     socket.current.emit("send-msg" , {
       to:currentChat._id,
     from:currentUser._id ,  
-    message:msg,
+    message:msg
   });
   const msgss = [...messages];
   msgss.push({
@@ -53,16 +54,40 @@ const ChatContainer = ({currentChat,currentUser , socket}) => {
     //when the first component will be loaded when socket current
 
     useEffect(()=>{
+      let count =0;
       if(socket.current){
         socket.current.on("msg-receive" , (msg)=>{
           setArrivalMessage({
             fromSelf:false , 
             message:msg
           });
-        });
-      }
-    } ,[]);
+            // if (document.visibilityState !== "visible") {
+            //   showNotification(msg);
+            // }
+          
+            if ( msg.username !== currentUser) {
+              count++; // increment count
+              console.log("msg count:", count);
+              setMessageCount(count); // set message count to updated value
+              console.log("Received message from:", msg.username);
+              setLatestMessage(msg);
+              console.log("Received message from:", msg.username);
+            }
+      // }
+      // if (msg.username !== 'currentChat') {
+      // countRef.current++;
+      // console.log("msg count:", countRef.current);
+      // setMessageCount(countRef.current);
+      // setLatestMessage(msg);
+        })
+    }
+    } , [currentUser]);
    
+    // useEffect(()=>{
+    //   socket.on('typing1' , (data)=>{
+    //    console.log(data);
+    //   })
+    // })
 
     //this will run every time when the new arrival messages
     useEffect(() => {
@@ -73,6 +98,30 @@ const ChatContainer = ({currentChat,currentUser , socket}) => {
     useEffect(() => {
       scrollRef.current?.scrollIntoView({ behavior: "smooth" });
     }, [messages]);
+    
+  
+   
+    // const displayNotification = ({ senderName }) => {
+    //   let action;
+    //   action ="You have new Message from ";
+      
+    //   return (
+    //     <span className="notification">{`${senderName} ${action} your post.`}</span>
+    //   );
+    // };
+  
+    // const handleRead = () => {
+    //   setNotifications([]);
+     
+    // };
+    const handleNotificationClick = () => {
+      // Show the message notification to the user
+      if (latestMessage) {
+        alert(`You have a new message from ${latestMessage.username}`);
+      }
+      // Reset the message count to 0
+      setMessageCount(0);
+    };
 
   return (
     <>
@@ -89,7 +138,29 @@ const ChatContainer = ({currentChat,currentUser , socket}) => {
                     <h3>{currentChat.username}</h3>
                 </div>
             </div>
+            <div className='icons'>
+            <div>
+        <Button onClick={handleNotificationClick}>
+        <svg   xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-bell-fill" viewBox="0 0 16 16">
+  <path d="M8 16a2 2 0 0 0 2-2H6a2 2 0 0 0 2 2zm.995-14.901a1 1 0 1 0-1.99 0A5.002 5.002 0 0 0 3 6c0 1.098-.5 6-2 7h14c-1.5-1-2-5.902-2-7 0-2.42-1.72-4.44-4.005-4.901z"/>
+</svg>
+{messageCount > 0 &&<span className='counter'>{messageCount}</span>}
+
+        </Button>
+        {/* {showNotifications && (
+        <div className="notifications">
+            {notifications.map((notification, index) => (
+            <div key={index}>{displayNotification(notification)}</div>
+          ))}
+          <button className="nButton" onClick={handleRead}>
+            Mark as read
+          </button>
+        </div> */}
+      {/* ) */}
+      {/* } */}
+    </div>
             <Logout/>
+            </div>
         </div>
          <div className="chat-messages">
           {messages.map((message)=>{
@@ -99,8 +170,8 @@ const ChatContainer = ({currentChat,currentUser , socket}) => {
                className={`message ${
                   message.fromSelf ? "sended" : "recieved"
                 }`}>
-                    <div className="content ">
-                  <p>{message.message}</p>
+                    <div  className="content " >
+                  <p>{message.message }</p>
                 </div>
                 </div>
               </div>
@@ -140,6 +211,11 @@ overflow: hidden;
         color: white;
       }
     }
+  }
+  .icons{
+    display: flex;
+    align-items: center;
+    gap: 1rem;
   }
 }
 .chat-messages {
@@ -184,4 +260,122 @@ overflow: hidden;
     }
   }
 }`;
+const Button  = styled.button`
+display:flex;
+justify-content: center;
+align-items: center;
+padding: 0.6rem;
+border-radius: 0.5rem;
+background-color: #9a86f3;
+border: none;
+cursor: pointer;
+svg {
+  font-size: 1.3rem;
+  color: #ebe7ff;
+  position:relative;
+}
+.counter{
+  width:11px;
+  height:9px;
+  background-color:red;
+  border-radius:50%
+  padding:5px;
+  font-size:9px;
+  color:white;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  position:absolute;
+  border-radius:2px;
+  top:92px;
+}
+.bi{
+    color:white;
+}
+.notifications {
+  position: absolute;
+  top: 50px;
+  right: 0;
+  background-color: white;
+  color: black;
+  font-weight: 300;
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+}
+
+.notification {
+  padding: 5px;
+  font-size: 14px;
+}
+
+.nButton {
+  width: 80%;
+  padding: 5px;
+  margin-top: 10px;
+}
+
+
+`;
+// const [activeChatId, setActiveChatId] = useState(null);
+// const [numNewMessages, setNumNewMessages] = useState(0);
+
+// useEffect(() => {
+//   if (socket.current) {
+//     socket.current.on("msg-receive", (msg) => {
+//       if (msg.chatId !== activeChatId) {
+//         setNumNewMessages((prev) => prev + 1);
+//       }
+//       setArrivalMessage({
+//         fromSelf: false,
+//         message: msg,
+//       });
+//     });
+//   }
+// }, [activeChatId]);
+
+// const handleChatClick = (chatId) => {
+//   setActiveChatId(chatId);
+//   setNumNewMessages(0);
+// };
+
+// return (
+//   <div>
+//     <NotificationIcon numNewMessages={numNewMessages} />
+//     <ChatList onChatClick={handleChatClick} />
+//   </div>
+// );
+
+
+// const [isActiveChat, setIsActiveChat] = useState(false);
+// const [numNewMessages, setNumNewMessages] = useState(0);
+
+// useEffect(() => {
+//   if (socket.current) {
+//     socket.current.on("msg-receive", (msg) => {
+//       if (!isActiveChat) {
+//         setNumNewMessages((prev) => prev + 1);
+//       }
+//       setArrivalMessage({
+//         fromSelf: false,
+//         message: msg,
+//       });
+//     });
+//   }
+// }, [isActiveChat]);
+
+// const handleChatClick = () => {
+//   setIsActiveChat(true);
+//   setNumNewMessages(0);
+// };
+
+// const handleChatClose = () => {
+//   setIsActiveChat(false);
+// };
+
+// return (
+//   <div>
+//     <NotificationIcon numNewMessages={numNewMessages} />
+//     <ChatWindow onClick={handleChatClick} onClose={handleChatClose} />
+//   </div>
 export default ChatContainer
